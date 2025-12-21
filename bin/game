@@ -1,0 +1,70 @@
+#!/usr/bin/env php
+<?php
+require __DIR__ . '/../vendor/autoload.php';
+
+use CliGame\InputProcessor;
+use CliGame\Map;
+use CliGame\Character\Player;
+use CliGame\Service\Container;
+use CliGame\Service\ShopService;
+use CliGame\Shop\Items\Potion;
+use CliGame\TreasureTracker;
+
+echo 'Welcome to the Dungeon! Type "help" for commands.' . PHP_EOL;
+
+// echo 'Enter name of player: ';
+// $playerName = trim(fgets(STDIN));
+$playerName = 'Hero';
+$player = new Player($playerName);
+
+// Build the map and mark the starting room as discovered
+$map = new Map($player, 5);
+$map->discoverRoom($player->getCurrentLocation(), $player);
+
+// Setup container and register core services
+$container = Container::getInstance();
+$container->instance(Player::class, $player);
+$container->instance(Map::class, $map);
+$container->bind(ShopService::class, function (Container $c) {
+    // You can add more items/weapons here later
+    return new ShopService([
+        new Potion('Minor Healing Potion', 5, 'Restores 20 HP', 20),
+        new Potion('Major Healing Potion', 10, 'Restores 40 HP', 40),
+    ]);
+});
+$container->bind(TreasureTracker::class, function (Container $c) use ($map) {
+    return new TreasureTracker();
+});
+
+dd($container);
+
+$inputProcessor = new InputProcessor($map, $player);
+
+$initialLook = $inputProcessor->process('look');
+if ($initialLook->getOutput() !== null) {
+    echo $initialLook->getOutput() . PHP_EOL;
+}
+
+$helpPrompt = $inputProcessor->process('help');
+if ($helpPrompt->getOutput() !== null) {
+    echo $helpPrompt->getOutput() . PHP_EOL;
+}
+
+$prompt = PHP_EOL . 'Enter command (help for list): ';
+echo $prompt;
+
+while (($input = fgets(STDIN)) !== false) {
+    $result = $inputProcessor->process($input);
+
+    if ($result->getOutput() !== null) {
+        echo $result->getOutput() . PHP_EOL;
+    }
+
+    if ($result->shouldExit()) {
+        break;
+    }
+
+    echo $prompt;
+}
+
+echo PHP_EOL . 'Done. Exiting.' . PHP_EOL;
