@@ -5,6 +5,7 @@ namespace CliGame;
 use CliGame\Enum\RoomType;
 use CliGame\Character\Monster;
 use CliGame\Character\Player;
+use CliGame\Service\Container;
 
 class Room
 {
@@ -16,14 +17,11 @@ class Room
 
     private ?Monster $monster;
 
-    private int $treasure = 0;
-
-    public function __construct(RoomType $type, Location $location, ?Monster $monster = null, int $treasure = 0)
+    public function __construct(RoomType $type, Location $location, ?Monster $monster = null)
     {
         $this->type = $type;
         $this->location = $location;
         $this->monster = $monster;
-        $this->treasure = $treasure;
     }
     
     public function getType(): RoomType
@@ -84,7 +82,7 @@ class Room
      */
     public function hasTreasure(): bool
     {
-        return $this->treasure > 0;
+        return $this->getTreasureAmount() > 0;
     }
 
     /**
@@ -92,7 +90,8 @@ class Room
      */
     public function getTreasureAmount(): int
     {
-        return $this->treasure;
+        $treasure = Container::getInstance()->get(TreasureTracker::class)->getTreasureByLocation($this->location);
+        return $treasure;
     }
 
     /**
@@ -100,9 +99,10 @@ class Room
      */
     public function collectTreasure(): int
     {
-        $collected = $this->treasure;
-        $this->treasure = 0;
+        $treasure = $this->getTreasureAmount();
+        
+        Container::getInstance()->get(TreasureTracker::class)->removeTreasureByLocation($this->location);
 
-        return $collected;
+        return $treasure;
     }
 }
