@@ -27,7 +27,7 @@ class PeekCommand extends Command
                 continue;
             }
 
-            $messages[] = "- {$room->getLocation()->printCoordinates()}: {$room->peek()}";
+            $messages[] = "- {$room->getLocation()->printCoordinates()}: {$room->peek()} (Treasure: {$room->getTreasureAmount()})";
 
             if (!$room->isDiscovered() && $room->hasMonster()) {
                 $messages[] = "  A monster is lurking here!";
@@ -63,8 +63,8 @@ class PeekCommand extends Command
 
     private function battle(Room $room)
     {
-        $battleService = new BattleService($this->player, $room->getMonster());
-        $battleResult = $battleService->startBattle();
+        $battleService = new BattleService();
+        $battleResult = $battleService->startBattle($this->player, $room->getMonster());
 
         return $battleResult;
     }

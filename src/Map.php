@@ -53,9 +53,9 @@ class Map
 
                 $treasure = $this->calculateAmountTreasureByRoom($roomType);
 
-                Container::getInstance()->get(TreasureTracker::class)->addTreasureByRoom();
+                Container::getInstance()->get(TreasureTracker::class)->addTreasureByLocation($location, $treasure);
 
-                $this->rooms[$y][$x] = new Room($roomType, $location, $monster, $treasure);
+                $this->rooms[$y][$x] = new Room($roomType, $location, $monster);
             }
         }
     }

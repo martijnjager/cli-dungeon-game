@@ -38,7 +38,7 @@ class TreasureTracker
         return $this->treasurePerRoom[$locationKey] ?? 0;
     }
 
-    public function getTreasureAmount(): int
+    public function getTotalTreasureAmount(): int
     {
         return array_sum($this->treasurePerRoom);
     }

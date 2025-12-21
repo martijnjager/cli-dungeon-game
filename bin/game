@@ -36,8 +36,6 @@ $container->bind(TreasureTracker::class, function (Container $c) use ($map) {
     return new TreasureTracker();
 });
 
-dd($container);
-
 $inputProcessor = new InputProcessor($map, $player);
 
 $initialLook = $inputProcessor->process('look');
