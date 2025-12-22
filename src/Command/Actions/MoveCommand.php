@@ -24,7 +24,7 @@ class MoveCommand extends Command
         $deltaDirection = MapDirection::deltaDirection($direction);
 
         if ($deltaDirection === null) {
-            return new CommandResult(false, 'Usage: move <north|south|east|west>');
+            return CommandResult::continue( 'Usage: move <north|south|east|west>');
         }
 
         [$dx, $dy] = $deltaDirection;
@@ -35,36 +35,36 @@ class MoveCommand extends Command
         );
 
         if (!$this->map->isValidLocation($newLocation)) {
-            return new CommandResult(false, 'You cannot move outside the map.');
+            return CommandResult::continue( 'You cannot move outside the map.');
         }
 
         $room = $this->map->getRoom($newLocation);
-        $messages = ['Moved ' . $direction . ' to (' . $newLocation->getX() . ',' . $newLocation->getY() . '). Room: ' . $room->getType()->value . '.'];
+        $messages = ['Moved ' . $direction . ' to (' . $newLocation->getX() . ',' . $newLocation->getY() . '). Room: ' . $room->getUndiscoveredType()->value . '.'];
 
         if ($room->hasMonster()) {
             $battleResult = $this->battle($room);
 
-            $messages[] = implode(PHP_EOL, $battleResult['log']);
-            if (!$battleResult['playerAlive']) {
+            $messages[] = implode(PHP_EOL, $battleResult->getLog());
+            if (!$battleResult->playerSurvived()) {
                 $messages[] = 'You have been defeated by the ' . $room->getMonster()->getName() . '!';
-                return new CommandResult(true, implode(PHP_EOL, $messages));
+                return CommandResult::quit( implode(PHP_EOL, $messages));
             }
 
-            if (!$room->getMonster()->isAlive()) {
+            if (!$battleResult->monsterSurvived()) {
                 $messages[] = "You have defeated the " . $room->getMonster()->getName() . "!";
             }
         }
 
         if ($this->player->isAlive() && $room->hasTreasure()) {
-            $messages[] = "You found a treasure: " . $room->getTreasureAmount() . "!";
-        }
-        if ($this->player->isAlive() && !$room->hasTreasure()) { 
-            $messages[] = "You already robbed this room.";
+            $messages[] = $room->hasTreasure() ? "You found a treasure: " . $room->getTreasureAmount() . "!" : "No treasure in this room.";
+            $treasure = $room->collectTreasure();
+    
+            $this->player->collectTreasure($treasure);
         }
 
         $this->map->discoverRoom($newLocation, $this->player);
 
-        return new CommandResult(false,  implode(PHP_EOL, $messages));
+        return CommandResult::continue(  implode(PHP_EOL, $messages));
     }
 
     public function help(): string

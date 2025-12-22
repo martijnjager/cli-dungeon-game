@@ -2,6 +2,7 @@
 
 namespace CliGame\Service;
 
+use CliGame\Battle\Result;
 use CliGame\Character\Player;
 use CliGame\Character\Monster;
 
@@ -12,9 +13,9 @@ class BattleService
 
     /**
      * Start the battle between player and monster
-     * @return array<string, mixed> Battle result including logs and status
+     * @return Result Battle result including logs and status
      */
-    public function startBattle(Player $player, Monster $monster): array
+    public function startBattle(Player $player, Monster $monster): Result
     {
         $this->player = $player;
         $this->monster = $monster;
@@ -44,11 +45,7 @@ class BattleService
             }
         }
 
-        return [
-            'log' => $log,
-            'playerAlive' => $this->player->isAlive(),
-            'monsterAlive' => $this->monster->isAlive(),
-        ];
+        return new Result($log, $this->player->isAlive(), $this->monster->isAlive());
     }
 
     /**

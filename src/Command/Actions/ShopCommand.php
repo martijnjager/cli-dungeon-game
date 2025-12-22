@@ -4,6 +4,7 @@ namespace CliGame\Command\Actions;
 
 use CliGame\Command\Command;
 use CliGame\Command\CommandResult;
+use CliGame\Service\ShopService;
 
 class ShopCommand extends Command
 {
@@ -14,7 +15,15 @@ class ShopCommand extends Command
 
     public function execute(array $arguments): CommandResult
     {
-        return new CommandResult(false, 'Shop is currently under construction.');
+        $shopService = $this->container->get(ShopService::class);
+
+        $items = $shopService->getItems();
+        $itemsForSale = [];
+        foreach ($items as $item) {
+            $itemsForSale[] = '#' . $item->getUniqueId() . ': ' . $item->getName() . ' - ' . $item->getPrice() . ' gold ' . ' - ' . $item->getDescription();
+        }
+
+        return CommandResult::continue(implode(PHP_EOL, $itemsForSale));
     }
 
     public function help(): string

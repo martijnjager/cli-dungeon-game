@@ -104,7 +104,7 @@ class Map
 
                 $x = $room->getLocation()->getX();
                 $y = $room->getLocation()->getY();
-                $mapArray[$y][$x] = ($isInRoom ? 'P: ' . $player->getAttackPower() : '') .  $room->getType()->value . ' ' . ($room->hasMonster() ? $room->getMonster()->getName() : '') . " (" . $x . "," . $y . ")";
+                $mapArray[$y][$x] = ($isInRoom ? 'P: ' : '') .  $room->getType()->value . ' ' . ($room->hasMonster() ? $room->getMonster()->getName() : '') . " (" . $x . "," . $y . ")";
             }
         }
 
@@ -142,16 +142,20 @@ class Map
     
     public function getAdjacentRoom(Location $currentLocation, string $direction): array
     {
-        $deltas = [
-            MapDirection::NORTH => [0, -1],
-            MapDirection::SOUTH => [0, 1],
-            MapDirection::EAST => [1, 0],
-            MapDirection::WEST => [-1, 0],
-        ];
+        $delta = MapDirection::deltaDirection($direction);
+
+        $newLocation = new Location(
+            $currentLocation->getX() + $delta[0],
+            $currentLocation->getY() + $delta[1]
+        );
+
+        if ($this->isValidLocation($newLocation)) {
+            return [$direction => $this->getRoom($newLocation)];
+        }
 
         $adjacentRooms = [];
 
-        foreach ($deltas as $dir => [$dx, $dy]) {
+        foreach (MapDirection::allDeltaDirections() as $dir => [$dx, $dy]) {
             $newLocation = new Location(
                 $currentLocation->getX() + $dx,
                 $currentLocation->getY() + $dy

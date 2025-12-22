@@ -26,7 +26,7 @@ class HelpCommand extends Command
 
         $message = implode(PHP_EOL, $messages);
 
-        return new CommandResult(false, $message);
+        return CommandResult::continue($message);
     }
 
     public function help(): string

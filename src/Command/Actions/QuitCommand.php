@@ -14,7 +14,7 @@ class QuitCommand extends Command
 
     public function execute(array $arguments): CommandResult
     {
-        return new CommandResult(true, 'Goodbye!');
+        return CommandResult::quit('Goodbye!');
     }
 
     public function help(): string

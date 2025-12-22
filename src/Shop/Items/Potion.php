@@ -2,6 +2,8 @@
 
 namespace CliGame\Shop\Items;
 
+use CliGame\Character\Player;
+
 class Potion extends Item
 {
     private int $healingAmount;
@@ -12,8 +14,8 @@ class Potion extends Item
         $this->healingAmount = $healingAmount;
     }
 
-    public function use()
+    public function use(Player $player): void
     {
-        return $this->healingAmount;
+        $player->increaseHealth($this->healingAmount);
     }
 }

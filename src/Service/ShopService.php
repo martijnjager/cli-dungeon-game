@@ -32,13 +32,63 @@ class ShopService
         }
     }
 
-    public function buyItem(Item $item, int &$playerGold): bool
+    public function findItemByName(string $name): ?Item
     {
-        if (in_array($item, $this->items, true) && $playerGold >= $item->getPrice()) {
-            $playerGold -= $item->getPrice();
-            $this->removeItem($item);
-            return true;
+        foreach ($this->items as $item) {
+            if ($item->getName() == $name) {
+                return $item;
+            }
         }
-        return false;
+        return null;
+    }
+
+    public function findItemById(int $id): ?Item
+    {
+        foreach ($this->items as $item) {
+            if ($item->getUniqueId() == $id) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    public function canBuyItem(Item $item, int $playerGold): bool
+    {
+        return in_array($item, $this->items, true) && $playerGold >= $item->getPrice();
+    }
+
+    public function buyItemByName(string $name, int &$playerGold): ?Item
+    {
+        $item = $this->findItemByName($name);
+        
+        if ($item === null) {
+            return null;
+        }
+
+        foreach ($this->items as $shopItem) {
+            if ($shopItem->getName() == $name) {
+                $item = $shopItem;
+                break;
+            }
+        }
+
+        if (!empty($item) && $playerGold >= $item->getPrice()) {
+            $playerGold -= $item->getPrice();
+            return $item;
+        }
+
+        return null;
+    }
+
+    public function buyItemById(int $id, int &$playerGold): ?Item
+    {
+        $item = $this->findItemById($id);
+        if ($item && $playerGold >= $item->getPrice()) {
+            $playerGold -= $item->getPrice();
+
+            return $item;
+        }
+        return null;
     }
 }

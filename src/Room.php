@@ -33,6 +33,11 @@ class Room
         return RoomType::UNKNOWN;
     }
 
+    public function getUndiscoveredType(): RoomType
+    {
+        return $this->type;
+    }
+
     public function getLocation(): Location
     {
         return $this->location;
@@ -100,7 +105,7 @@ class Room
     public function collectTreasure(): int
     {
         $treasure = $this->getTreasureAmount();
-        
+
         Container::getInstance()->get(TreasureTracker::class)->removeTreasureByLocation($this->location);
 
         return $treasure;

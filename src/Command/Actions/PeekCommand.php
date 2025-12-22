@@ -35,16 +35,17 @@ class PeekCommand extends Command
                 $caughtUserPeeking = $room->getMonster()->caughtPlayerPeeking();
 
                 if ($caughtUserPeeking) {
-                    $messages[] = "  The monster has caught you peeking! Prepare for battle!";
-                    $battleResult = $this->battle($room);
-                    
-                    $messages = array_merge($messages, $battleResult['log']);
-                    if (!$battleResult['playerAlive']) {
-                        $messages[] = 'You have been defeated by the ' . $room->getMonster()->getName() . '!';
+                    $this->failedPeek($room, $messages);
+
+                    if (!$this->player->isAlive()) {
                         return new CommandResult(true, implode(PHP_EOL, $messages));
-                    } else {
-                        $messages[] = "  You survived the encounter while peeking.";
                     }
+
+                    if ($room->hasTreasure()) {
+                        $messages[] = "You found a treasure: " . $room->getTreasureAmount() . "!";
+                    }
+
+                    $this->map->discoverRoom($room->getLocation(), $this->player);
                 } else {
                     $messages[] = "  You managed to peek without being noticed.";
                 }
@@ -59,6 +60,19 @@ class PeekCommand extends Command
     public function help(): string
     {
         return 'Displays the status of adjacent room by direction input (discovered or undiscovered).';
+    }
+
+    private function failedPeek(Room $room, array &$messages)
+    {
+        $messages[] = "  The monster has caught you peeking! Prepare for battle!";
+        $battleResult = $this->battle($room);
+        
+        $messages = array_merge($messages, $battleResult->getLog());
+        if (!$battleResult->playerSurvived()) {
+            $messages[] = 'You have been defeated by the ' . $room->getMonster()->getName() . '!';
+        } else {
+            $messages[] = "  You survived the encounter while peeking.";
+        }
     }
 
     private function battle(Room $room)

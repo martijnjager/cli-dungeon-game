@@ -4,6 +4,7 @@ namespace CliGame\Command;
 
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Service\Container;
 use ReflectionClass;
 
 class CommandDiscovery
@@ -41,8 +42,9 @@ class CommandDiscovery
             }
 
             /** @var Command $instance */
-            $instance = $reflection->newInstance($map, $player);
+            $instance = $reflection->newInstance($map, $player, Container::getInstance());
             $commands[$instance->getName()] = $instance;
+            Command::register($instance);
         }
 
         return $commands;
