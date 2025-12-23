@@ -20,7 +20,7 @@ class ShopCommand extends Command
         $items = $shopService->getItems();
         $itemsForSale = [];
         foreach ($items as $item) {
-            $itemsForSale[] = '#' . $item->getUniqueId() . ': ' . $item->getName() . ' - ' . $item->getPrice() . ' gold ' . ' - ' . $item->getDescription();
+            $itemsForSale[] = $item->printShop();
         }
 
         return CommandResult::continue(implode(PHP_EOL, $itemsForSale));

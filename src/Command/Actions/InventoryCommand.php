@@ -19,9 +19,11 @@ class InventoryCommand extends Command
             return CommandResult::continue('Your inventory is empty.');
         }
 
+        $itemLines = [];
+
         foreach ($items as $itemData) {
             $item = $itemData['item'];
-            $itemLines[] = '#' . $item->getUniqueId() . ': ' . $item->getName() . ' - ' . $item->getDescription() . ' (' . $itemData['quantity'] . ')';
+            $itemLines[] = $item->printInfo() . ' (' . $itemData['quantity'] . ')';
         }
 
         return CommandResult::continue(implode(PHP_EOL, $itemLines));

@@ -23,7 +23,7 @@ class StatusCommand extends Command
             $message .= ', Inventory: Empty';
         } else {
             $itemNames = array_map(function ($itemData) {
-                return '#' . $itemData['item']->getUniqueId() . ' - ' . $itemData['item']->getName() . ' ' . $itemData['item']->getDescription() . ' (' . $itemData['quantity'] . ')';
+                return $itemData['item']->printInfo() . ' (' . $itemData['quantity'] . ')';
             }, $inventory);
             $message .= PHP_EOL . 'Inventory: ' . PHP_EOL . implode(PHP_EOL, $itemNames);
         }

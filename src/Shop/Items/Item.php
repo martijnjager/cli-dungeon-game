@@ -45,5 +45,20 @@ abstract class Item
         return spl_object_id($this);
     }
 
+    public function is($itemName): bool
+    {
+        return $this->name === $itemName || $this->uniqueId == $itemName;
+    }
+
     abstract public function use(Player $player);
+
+    public function printInfo()
+    {
+        return '#' . $this->uniqueId . ': ' . $this->name . ' - ' . $this->description;
+    }
+
+    public function printShop()
+    {
+        return '#' . $this->uniqueId . ': ' . $this->name . ' - ' . $this->price . ' gold ' . ' - ' . $this->description;
+    }
 }

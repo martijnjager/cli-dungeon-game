@@ -90,6 +90,12 @@ class Player
         $this->inventory->addItem($item);
     }
 
+    public function buyItem(Item $item): void
+    {
+        $this->inventory->deduct($item->getPrice());
+        $this->addToInventory($item);
+    }
+
     public function increaseHealth(int $amount): void
     {
         $this->currentHealth += $amount;
@@ -97,5 +103,10 @@ class Player
         if ($this->currentHealth > 100) {
             $this->currentHealth = 100;
         }
+    }
+
+    public function canAfford(Item $item)
+    {
+        return $this->inventory->getTreasureCollected() >= $item->getPrice();
     }
 }

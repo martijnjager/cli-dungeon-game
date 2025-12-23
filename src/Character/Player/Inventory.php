@@ -17,13 +17,10 @@ class Inventory
                 'quantity' => 1
             ];
 
-            $this->treasure -= $item->getPrice();
-            
             return;
         }
 
         $this->items[$item->getUniqueId()] ['quantity']++;
-        $this->treasure -= $item->getPrice();
     }
 
     public function removeItem(Item $item): void
@@ -43,7 +40,7 @@ class Inventory
     public function getItemById(int $id): Item|null
     {
         foreach ($this->items as $item) {
-            if ($item['item']->getUniqueId() == $id) {
+            if ($item['item']->is($id)) {
                 return $item['item'];
             }
         }
@@ -54,7 +51,7 @@ class Inventory
     public function getItemByName(string $name): Item|null
     {
         foreach ($this->items as $item) {
-            if ($item['item']->getName() === $name) {
+            if ($item['item']->is($name)) {
                 return $item['item'];
             }
         }
@@ -74,5 +71,10 @@ class Inventory
     public function getTreasureCollected(): int
     {
         return $this->treasure;
+    }
+
+    public function deduct(int $amount): void
+    {
+        $this->treasure -= $amount;
     }
 }

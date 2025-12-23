@@ -2,6 +2,7 @@
 
 namespace CliGame\Service;
 
+use CliGame\Character\Player;
 use CliGame\Shop\Items\Item;
 
 class ShopService
@@ -35,7 +36,7 @@ class ShopService
     public function findItemByName(string $name): ?Item
     {
         foreach ($this->items as $item) {
-            if ($item->getName() == $name) {
+            if ($item->is($name)) {
                 return $item;
             }
         }
@@ -45,7 +46,7 @@ class ShopService
     public function findItemById(int $id): ?Item
     {
         foreach ($this->items as $item) {
-            if ($item->getUniqueId() == $id) {
+            if ($item->is($id)) {
                 return $item;
             }
         }
@@ -53,12 +54,7 @@ class ShopService
         return null;
     }
 
-    public function canBuyItem(Item $item, int $playerGold): bool
-    {
-        return in_array($item, $this->items, true) && $playerGold >= $item->getPrice();
-    }
-
-    public function buyItemByName(string $name, int &$playerGold): ?Item
+    public function buyItemByName(string $name, Player $player): ?Item
     {
         $item = $this->findItemByName($name);
         
@@ -67,25 +63,25 @@ class ShopService
         }
 
         foreach ($this->items as $shopItem) {
-            if ($shopItem->getName() == $name) {
+            if ($shopItem->is($name)) {
                 $item = $shopItem;
                 break;
             }
         }
 
-        if (!empty($item) && $playerGold >= $item->getPrice()) {
-            $playerGold -= $item->getPrice();
+        if (!empty($item) && $player->canAfford($item)) {
+            $player->buyItem($item);
             return $item;
         }
 
         return null;
     }
 
-    public function buyItemById(int $id, int &$playerGold): ?Item
+    public function buyItemById(int $id, Player $player): ?Item
     {
         $item = $this->findItemById($id);
-        if ($item && $playerGold >= $item->getPrice()) {
-            $playerGold -= $item->getPrice();
+        if ($item && $player->canAfford($item)) {
+            $player->buyItem($item);
 
             return $item;
         }
