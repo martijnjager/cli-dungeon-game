@@ -2,10 +2,9 @@
 
 namespace CliGame\Command\Actions;
 
+use CliGame\Battle\Result;
 use CliGame\Command\Command;
 use CliGame\Command\CommandResult;
-use CliGame\Character\Player;
-use CliGame\Character\Monster;
 use CliGame\Enum\MapDirection;
 use CliGame\Location;
 use CliGame\Room;
@@ -72,7 +71,7 @@ class MoveCommand extends Command
         return 'Moves the player in the specified direction (north, south, east, west).';
     }
 
-    private function battle(Room $room)
+    private function battle(Room $room): Result
     {
         $battleService = new BattleService();
         $battleResult = $battleService->startBattle($this->player, $room->getMonster());

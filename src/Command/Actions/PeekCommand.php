@@ -4,6 +4,7 @@ namespace CliGame\Command\Actions;
 
 use CliGame\Command\Command;
 use CliGame\Command\CommandResult;
+use CliGame\Enum\MapDirection;
 use CliGame\Service\BattleService;
 use CliGame\Room;
 
@@ -18,6 +19,11 @@ class PeekCommand extends Command
     {
         $direction = strtolower($arguments[0] ?? '');
         $location = $this->player->getCurrentLocation();
+
+        if (!array_key_exists($direction, MapDirection::allDeltaDirections())) {
+            return CommandResult::continue( 'Usage: peek <north|south|east|west>');
+        }
+
         $adjacentRooms = $this->map->getAdjacentRoom($location, $direction);
         $messages = ['Adjacent rooms:'];
 
