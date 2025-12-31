@@ -1,6 +1,7 @@
 {
     "name": "example/cli-dungeon",
     "description": "A simple PHP CLI dungeon exploration game",
+    "license": "MIT",
     "type": "project",
     "require": {
         "php": "^8.1",
