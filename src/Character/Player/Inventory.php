@@ -9,6 +9,8 @@ class Inventory
     private array $items = [];
     private int $treasure = 0;
 
+    protected array $weapons = [];
+
     public function addItem(Item $item): void
     {
         if (empty($this->items[ $item->getUniqueId() ])) {

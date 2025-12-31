@@ -4,19 +4,28 @@ use CliGame\Command\Actions\MoveCommand;
 use CliGame\Location;
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Enum\RoomType;
+use CliGame\Service\Container;
+use CliGame\Service\ShopService;
+use CliGame\TreasureTracker;
 use PHPUnit\Framework\TestCase;
 
 class MoveCommandTest extends TestCase
 {
     private Player $player;
     private Map $map;
+    private Container $container;
     private MoveCommand $command;
 
     protected function setUp(): void
     {
         $this->player = new Player('Tester');
-        $this->map = new Map($this->player, 3);
-        $this->command = new MoveCommand($this->map, $this->player);
+        $this->container = Container::getInstance();
+        $this->container->instance(TreasureTracker::class, new TreasureTracker());
+        $this->container->bind(ShopService::class, fn() => new ShopService([]));
+
+        $this->map = $this->createPeacefulMap($this->player, 3);
+        $this->command = new MoveCommand($this->map, $this->player, $this->container);
     }
 
     public function testMovesEastUpdatesLocationAndDiscoversRoom(): void
@@ -24,7 +33,7 @@ class MoveCommandTest extends TestCase
         $result = $this->command->execute(['east']);
 
         $this->assertFalse($result->shouldExit());
-        $this->assertStringContainsString('Moved east', $result->getOutput() ?? '');
+        $this->assertStringContainsString('Moved east to (1,0)', $result->getOutput() ?? '');
 
         $location = $this->player->getCurrentLocation();
         $this->assertSame(1, $location->getX());
@@ -61,5 +70,16 @@ class MoveCommandTest extends TestCase
         $current = $this->player->getCurrentLocation();
         $this->assertSame($initial->getX(), $current->getX());
         $this->assertSame($initial->getY(), $current->getY(), 'Player should remain in place when movement is blocked.');
+    }
+
+    private function createPeacefulMap(Player $player, int $size): Map
+    {
+        return new class($player, $size) extends Map {
+            public function decideRoomType(int &$numberOfEnemyRooms, int &$numberOfTreasureRooms, int &$numberOfEmptyRooms): RoomType
+            {
+                $numberOfEmptyRooms++;
+                return RoomType::EMPTY;
+            }
+        };
     }
 }

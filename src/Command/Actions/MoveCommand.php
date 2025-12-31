@@ -9,6 +9,7 @@ use CliGame\Enum\MapDirection;
 use CliGame\Location;
 use CliGame\Room;
 use CliGame\Service\BattleService;
+use CliGame\Service\IO;
 
 class MoveCommand extends Command
 {
@@ -43,19 +44,19 @@ class MoveCommand extends Command
         if ($room->hasMonster()) {
             $battleResult = $this->battle($room);
 
-            $messages[] = implode(PHP_EOL, $battleResult->getLog());
             if (!$battleResult->playerSurvived()) {
-                $messages[] = 'You have been defeated by the ' . $room->getMonster()->getName() . '!';
+                IO::writeLine('You have been defeated by the ' . $room->getMonster()->getName() . '!');
                 return CommandResult::quit( implode(PHP_EOL, $messages));
             }
 
             if (!$battleResult->monsterSurvived()) {
-                $messages[] = "You have defeated the " . $room->getMonster()->getName() . "!";
+                IO::writeLine('You have defeated the ' . $room->getMonster()->getName() . '!');
             }
         }
 
         if ($this->player->isAlive() && $room->hasTreasure()) {
-            $messages[] = $room->hasTreasure() ? "You found a treasure: " . $room->getTreasureAmount() . "!" : "No treasure in this room.";
+            $treasureMessage = $room->hasTreasure() ? "You found a treasure: " . $room->getTreasureAmount() . "!" : "No treasure in this room.";
+            IO::writeLine($treasureMessage);
             $treasure = $room->collectTreasure();
     
             $this->player->collectTreasure($treasure);

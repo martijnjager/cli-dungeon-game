@@ -4,6 +4,9 @@ use CliGame\Command\Command;
 use CliGame\Command\CommandDiscovery;
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Service\Container;
+use CliGame\Service\ShopService;
+use CliGame\TreasureTracker;
 use PHPUnit\Framework\TestCase;
 
 class CommandDiscoveryTest extends TestCase
@@ -11,6 +14,9 @@ class CommandDiscoveryTest extends TestCase
     protected function setUp(): void
     {
         Command::clearRegistry();
+        $container = Container::getInstance();
+        $container->instance(TreasureTracker::class, new TreasureTracker());
+        $container->bind(ShopService::class, fn() => new ShopService([]));
     }
 
     public function testDiscoversActionCommands(): void
@@ -21,11 +27,20 @@ class CommandDiscoveryTest extends TestCase
         $discovery = new CommandDiscovery();
         $commands = $discovery->load($map, $player);
 
-        $this->assertArrayHasKey('help', $commands);
-        $this->assertArrayHasKey('move', $commands);
-        $this->assertArrayHasKey('look', $commands);
-        $this->assertArrayHasKey('status', $commands);
-        $this->assertArrayHasKey('quit', $commands);
+        $expected = [
+            'buy',
+            'help',
+            'inventory',
+            'look',
+            'move',
+            'peek',
+            'quit',
+            'shop',
+            'status',
+            'use-item',
+        ];
+
+        $this->assertEqualsCanonicalizing($expected, array_keys($commands));
 
         $this->assertContainsOnlyInstancesOf(Command::class, $commands);
         $this->assertSame($commands, Command::all(), 'Commands should be registered globally.');

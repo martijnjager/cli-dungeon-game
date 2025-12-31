@@ -47,7 +47,7 @@ abstract class Item
 
     public function is($itemName): bool
     {
-        return $this->name === $itemName || $this->uniqueId == $itemName;
+        return $this->name == $itemName || $this->uniqueId == $itemName;
     }
 
     abstract public function use(Player $player);

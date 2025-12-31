@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache/files
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-version }}-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Lint PHP syntax
+        run: |
+          php -l bin/game
+          find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Run test suite
+        run: vendor/bin/phpunit --do-not-cache-result
+
+      - name: Smoke test game start
+        run: echo "quit" | php bin/game

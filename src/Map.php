@@ -104,7 +104,7 @@ class Map
 
                 $x = $room->getLocation()->getX();
                 $y = $room->getLocation()->getY();
-                $mapArray[$y][$x] = ($isInRoom ? 'P: ' : '') .  $room->getType()->value . ' ' . ($room->hasMonster() ? $room->getMonster()->getName() : '') . " (" . $x . "," . $y . ")";
+                $mapArray[$y][$x] = ($isInRoom ? 'P: ' : '') .  $room->getType()->value . ($room->hasMonster() ? ' monster ' : '') . ' ' . " (" . $x . "," . $y . ")";
             }
         }
 

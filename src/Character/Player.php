@@ -3,6 +3,8 @@
 namespace CliGame\Character;
 
 use CliGame\Character\Player\Inventory;
+use CliGame\Character\Player\Weapon;
+use CliGame\Character\Player\Weapon\Fist;
 use CliGame\Location;
 use CliGame\Shop\Items\Item;
 use CliGame\Trait\AttackPower;
@@ -25,6 +27,8 @@ class Player
 
     private Inventory $inventory;
 
+    protected Weapon $activeWeapon;
+
     public function __construct(string $name, ?Location $startingLocation = null)
     {
         $this->name = $name;
@@ -33,6 +37,18 @@ class Player
         $this->minAttackPower = 5;
         $this->maxAttackPower = 15;
         $this->inventory = new Inventory();
+
+        $this->useWeapon(new Fist());
+    }
+
+    public function useWeapon(Weapon $weapon)
+    {
+        $this->activeWeapon = $weapon;
+    }
+
+    public function getActiveWeapon(): Weapon
+    {
+        return $this->activeWeapon;
     }
 
     public function getName()
@@ -107,6 +123,6 @@ class Player
 
     public function canAfford(Item $item)
     {
-        return $this->inventory->getTreasureCollected() >= $item->getPrice();
+        return $this->getTreasureCollected() >= $item->getPrice();
     }
 }

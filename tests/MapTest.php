@@ -3,10 +3,17 @@
 use CliGame\Map;
 use CliGame\Character\Player;
 use CliGame\Enum\MapDirection;
+use CliGame\Service\Container;
+use CliGame\TreasureTracker;
 use PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Container::getInstance()->instance(TreasureTracker::class, new TreasureTracker());
+    }
+
     public function testPrintMapInMatrixFormatHasCorrectStructure(): void
     {
         $player = new Player('Tester');
@@ -82,20 +89,22 @@ class MapTest extends TestCase
         $map = new Map($player, 3);
         $location = $player->getCurrentLocation();
 
-        $adjacentRooms = $map->getAdjacentRoom($location, '');
+        $adjacentRooms = $map->getAdjacentRoom($location, MapDirection::EAST->value);
 
         $this->assertIsArray($adjacentRooms);
-        $this->assertNotEmpty($adjacentRooms, 'There should be adjacent rooms.');
+        $this->assertCount(1, $adjacentRooms);
+        $this->assertArrayHasKey(MapDirection::EAST->value, $adjacentRooms, 'Should return room for the requested direction.');
 
         foreach ($adjacentRooms as $direction => $room) {
             $this->assertContains($direction, MapDirection::toArray(), 'Direction should be valid.');
             $this->assertNotNull($room, 'Adjacent room should not be null.');
         }
 
-        $specificDirection = 'south';
-        $specificRoom = $map->getAdjacentRoom($location, $specificDirection);
+        $blockedDirection = MapDirection::NORTH->value;
+        $fallbackRooms = $map->getAdjacentRoom($location, $blockedDirection);
 
-        $this->assertIsArray($specificRoom);
-        $this->assertArrayHasKey($specificDirection, $specificRoom, 'Should return room for the specific direction.');
+        $this->assertIsArray($fallbackRooms);
+        $this->assertArrayHasKey(MapDirection::EAST->value, $fallbackRooms);
+        $this->assertArrayHasKey(MapDirection::SOUTH->value, $fallbackRooms);
     }
 }

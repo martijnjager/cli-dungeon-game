@@ -47,4 +47,10 @@ abstract class Command
     {
         self::$registry[$command->getName()] = $command;
     }
+
+    public function ask(string $prompt): string
+    {
+        echo $prompt . ' ';
+        return trim(fgets(STDIN));
+    }
 }
