@@ -6,6 +6,8 @@ on:
 
 jobs:
   test:
+    name: Test (PHP ${{ matrix.php-version }})
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,6 +42,9 @@ jobs:
         run: |
           php -l bin/game
           find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse src tests
 
       - name: Run test suite
         run: vendor/bin/phpunit --do-not-cache-result
