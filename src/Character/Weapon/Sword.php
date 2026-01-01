@@ -3,7 +3,7 @@
 namespace CliGame\Character\Player\Weapon;
 
 use CliGame\Character\Player;
-use CliGame\Character\Player\Weapon;
+use CliGame\Character\Weapon;
 
 /**
  * Defeat a globin in 2-3 attacks

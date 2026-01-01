@@ -1,6 +1,6 @@
 <?php
 
-namespace CliGame\Character\Player;
+namespace CliGame\Character;
 
 use CliGame\Shop\Items\Item;
 

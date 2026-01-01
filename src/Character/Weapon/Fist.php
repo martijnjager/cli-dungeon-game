@@ -1,10 +1,10 @@
 <?php
 
-namespace CliGame\Character\Player\Weapon;
+namespace CliGame\Character\Weapon;
 
 use CliGame\Character\Player;
-use CliGame\Character\Player\AttackOption;
-use CliGame\Character\Player\Weapon;
+use CliGame\Character\AttackOption;
+use CliGame\Character\Weapon;
 
 /**
  * Defeat a globin in 4-5 attacks

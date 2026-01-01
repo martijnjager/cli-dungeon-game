@@ -3,8 +3,8 @@
 namespace CliGame\Character;
 
 use CliGame\Character\Player\Inventory;
-use CliGame\Character\Player\Weapon;
-use CliGame\Character\Player\Weapon\Fist;
+use CliGame\Character\Weapon;
+use CliGame\Character\Weapon\Fist;
 use CliGame\Location;
 use CliGame\Shop\Items\Item;
 use CliGame\Trait\AttackPower;

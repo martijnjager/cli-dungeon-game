@@ -1,6 +1,6 @@
 <?php
 
-namespace CliGame\Character\Player;
+namespace CliGame\Character;
 
 use CliGame\Service\IO;
 
@@ -12,7 +12,7 @@ class AttackOption
         protected string $minDamage,
         protected int $maxDamage,
         protected float $criticalChance = 0.0,
-        public int $hitChance = 100,
+        public int $hitChance = 0,
     )
     {
     }

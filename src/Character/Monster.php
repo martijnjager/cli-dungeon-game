@@ -2,6 +2,7 @@
 
 namespace CliGame\Character;
 
+use CliGame\Character\Weapon\DefaultWeapon;
 use CliGame\Enum\MonsterType;
 use CliGame\Trait\AttackPower;
 
@@ -15,6 +16,13 @@ class Monster
     protected bool $isBoss = false;
 
     protected bool $canPeek = true;
+
+    protected Weapon $activeWeapon;
+
+    public function __construct()
+    {
+        $this->activeWeapon = new DefaultWeapon("Default Weapon", 0, "A basic weapon with no special abilities.");
+    }
 
     public function getName(): string
     {
@@ -63,5 +71,16 @@ class Monster
         }
         
         return !$this->canPeek;
+    }
+
+    public function getActiveWeapon(): Weapon
+    {
+        return $this->activeWeapon;
+    }
+
+    public function chooseAttackOption(): AttackOption
+    {
+        $options = $this->activeWeapon->getAttackOptions();
+        return $options[array_rand($options)];
     }
 }

@@ -25,8 +25,6 @@ class BattleService
 
             $startingTurn = $this->calculateStartingTurn();
 
-            IO::writeLine("New Round! " . ucfirst($startingTurn) . " starts first.");
-
             switch ($startingTurn) {
                 case 'player':
                     $this->playerTurn();
@@ -105,7 +103,14 @@ class BattleService
     private function monsterTurn()
     {
         // Monster's attack logic
-        $damage = $this->monster->getAttackPower();
+        $attackOption = $this->monster->chooseAttackOption();
+
+        if (!$this->calculateReceivesHit($attackOption->hitChance)) {
+            IO::writeLine($this->monster->getName() . " tried to use " . $attackOption->name . " but missed!");
+            return;
+        }
+
+        $damage = $attackOption->damage();
         $this->handleDealDamage($this->monster, $this->player, $damage);
     }
 
