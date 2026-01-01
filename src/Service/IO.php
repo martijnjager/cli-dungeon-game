@@ -9,15 +9,15 @@ class IO
         echo $message . PHP_EOL;
     }
 
-    public static function read(string $prompt): string
+    public static function read(): string
     {
-        echo $prompt . ' ';
         return trim(fgets(STDIN));
     }
 
     public static function confirm(string $prompt): bool
     {
-        $response = static::read($prompt . ' (y/n):');
+        static::writeLine($prompt . ' (y/n):');
+        $response = static::read();
         return strtolower($response) === 'y';
     }
 }
