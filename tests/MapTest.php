@@ -2,6 +2,7 @@
 
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Enum\Difficulty;
 use CliGame\Enum\MapDirection;
 use CliGame\Service\Container;
 use CliGame\TreasureTracker;
@@ -17,7 +18,8 @@ class MapTest extends TestCase
     public function testPrintMapInMatrixFormatHasCorrectStructure(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $matrix = $map->printMapInMatrixFormat($player);
 
         $this->assertIsArray($matrix);
@@ -38,7 +40,8 @@ class MapTest extends TestCase
     public function testIsValidLocation(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
 
         $this->assertTrue($map->isValidLocation($player->getCurrentLocation()));
         $this->assertFalse($map->isValidLocation(new \CliGame\Location(5, 5)));
@@ -47,7 +50,8 @@ class MapTest extends TestCase
     public function testDiscoverRoomMarksRoomAsDiscovered(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $this->assertFalse($map->isRoomDiscovered($location), 'Room should initially be undiscovered.');
@@ -60,7 +64,8 @@ class MapTest extends TestCase
     public function testGetRoomReturnsCorrectRoomOrNull(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $room = $map->getRoom($location);
@@ -73,7 +78,8 @@ class MapTest extends TestCase
     public function testIsRoomDiscoveredReturnsCorrectStatus(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $this->assertFalse($map->isRoomDiscovered($location), 'Room should initially be undiscovered.');
@@ -86,7 +92,8 @@ class MapTest extends TestCase
     public function testGetAdjacentRoomReturnsCorrectRooms(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $adjacentRooms = $map->getAdjacentRoom($location, MapDirection::EAST->value);

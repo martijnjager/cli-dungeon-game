@@ -4,6 +4,7 @@ use CliGame\Command\Command;
 use CliGame\Command\CommandDiscovery;
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Enum\Difficulty;
 use CliGame\Service\Container;
 use CliGame\Service\ShopService;
 use CliGame\TreasureTracker;
@@ -22,7 +23,8 @@ class CommandDiscoveryTest extends TestCase
     public function testDiscoversActionCommands(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
 
         $discovery = new CommandDiscovery();
         $commands = $discovery->load($map, $player);
@@ -49,7 +51,8 @@ class CommandDiscoveryTest extends TestCase
     public function testNoCommandsDiscoveredInEmptyDirectory(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
 
         $discovery = new CommandDiscovery(__DIR__ . '/EmptyCommands', 'CliGame\\Command\\EmptyCommands');
         $commands = $discovery->load($map, $player);

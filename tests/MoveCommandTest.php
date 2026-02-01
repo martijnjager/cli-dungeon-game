@@ -1,9 +1,9 @@
 <?php
 
 use CliGame\Command\Actions\MoveCommand;
-use CliGame\Location;
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Enum\Difficulty;
 use CliGame\Enum\RoomType;
 use CliGame\Service\Container;
 use CliGame\Service\ShopService;
@@ -74,7 +74,8 @@ class MoveCommandTest extends TestCase
 
     private function createPeacefulMap(Player $player, int $size): Map
     {
-        return new class($player, $size) extends Map {
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        return new class($player, $size, $difficulty) extends Map {
             public function decideRoomType(int &$numberOfEnemyRooms, int &$numberOfTreasureRooms, int &$numberOfEmptyRooms): RoomType
             {
                 $numberOfEmptyRooms++;
