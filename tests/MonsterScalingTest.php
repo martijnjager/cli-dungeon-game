@@ -118,8 +118,8 @@ class MonsterScalingTest extends TestCase
         $troll = new Troll($difficulty);
         $dragon = new Dragon($difficulty);
 
-        $this->assertLessThanOrEqual($goblin->getMaxAttackPower(), $goblin->getMinAttackPower());
-        $this->assertLessThanOrEqual($troll->getMaxAttackPower(), $troll->getMinAttackPower());
-        $this->assertLessThanOrEqual($dragon->getMaxAttackPower(), $dragon->getMinAttackPower());
+        $this->assertLessThanOrEqual($goblin->getMinAttackPower(), $goblin->getMaxAttackPower());
+        $this->assertLessThanOrEqual($troll->getMinAttackPower(), $troll->getMaxAttackPower());
+        $this->assertLessThanOrEqual($dragon->getMinAttackPower(), $dragon->getMaxAttackPower());
     }
 }

@@ -100,7 +100,7 @@ class MonsterFactory
             if ($diffMultiplier < 1.0) {
                 // Easy mode: reduce weight for higher power monsters
                 $weight = 1.0 / pow($powerLevel, 1.5);
-            } else if ($diffMultiplier > 1.0) {
+            } elseif ($diffMultiplier > 1.0) {
                 // Hard mode: increase weight for higher power monsters
                 $weight = pow($powerLevel, 1.5);
             } else {
