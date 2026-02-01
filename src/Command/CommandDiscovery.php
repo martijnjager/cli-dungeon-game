@@ -5,10 +5,13 @@ namespace CliGame\Command;
 use CliGame\Map;
 use CliGame\Character\Player;
 use CliGame\Service\Container;
+use CliGame\Trait\Discoverer;
 use ReflectionClass;
 
 class CommandDiscovery
 {
+    use Discoverer;
+
     private string $commandDirectory;
     private string $commandNamespace;
 
@@ -26,7 +29,11 @@ class CommandDiscovery
     public function load(Map $map, Player $player): array
     {
         $commands = [];
-        $commandFiles = glob($this->commandDirectory . DIRECTORY_SEPARATOR . '*Command.php') ?: [];
+        $commandFiles = $this->discoverClasses(
+            $this->commandDirectory,
+            $this->commandNamespace,
+            'Command'
+        );
 
         foreach ($commandFiles as $file) {
             $className = $this->commandNamespace . '\\' . basename($file, '.php');

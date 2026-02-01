@@ -2,6 +2,7 @@
 
 namespace CliGame;
 
+use CliGame\Balancer\DifficultyProfile;
 use CliGame\Character\Monster;
 use CliGame\Character\Monsters\Dragon;
 use CliGame\Character\Monsters\Goblin;
@@ -16,9 +17,11 @@ class Map
 {
     /** @var array<int,array<int,Room>> */
     private array $rooms = [];
+    private ?DifficultyProfile $difficultyProfile = null;
 
-    public function __construct(Player $player, int $numberOfEmptyRooms = 3)
+    public function __construct(Player $player, int $numberOfEmptyRooms = 3, ?DifficultyProfile $difficulty = null)
     {
+        $this->difficultyProfile = $difficulty;
         $this->generateDefaultMap($player, $numberOfEmptyRooms);
     }
 
@@ -179,19 +182,19 @@ class Map
         $roll = mt_rand() / mt_getrandmax();
 
         if ($roll < 0.3) {
-            return new Goblin();
+            return new Goblin($this->difficultyProfile);
         }
 
         if ($roll < 0.5) {
-            return new Troll();
+            return new Troll($this->difficultyProfile);
         }
 
         if ($roll < 0.6) {
-            return new Dragon();
+            return new Dragon($this->difficultyProfile);
         }
 
         // Default/fallback
-        return new Goblin();
+        return new Goblin($this->difficultyProfile);
     }
 
     private function calculateAmountTreasureByRoom(RoomType $roomType): int

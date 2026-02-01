@@ -8,9 +8,22 @@ class DifficultyProfile
         private array $enemyHitsToKill,
         private array $playerHitsToDie,
         private array $potionHealRatio,
-        private float $damageVarianceFactor,
-        private float $treasureAmountFactor
+        public readonly float $difficultyMultiplier = 1.0,
     )
     {
+    }
+
+    public function minimumEnemyHitsToKill(): int
+    {
+        return $this->enemyHitsToKill[0];
+    }
+    public function maximumEnemyHitsToKill(): int
+    {
+        return $this->enemyHitsToKill[1];
+    }
+
+    public function potionHealRatioRange(): array
+    {
+        return $this->potionHealRatio;
     }
 }

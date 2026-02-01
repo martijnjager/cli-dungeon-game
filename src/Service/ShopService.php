@@ -2,8 +2,10 @@
 
 namespace CliGame\Service;
 
+use CliGame\Balancer\DifficultyProfile;
 use CliGame\Character\Player;
 use CliGame\Shop\Items\Item;
+use CliGame\Shop\Items\Potion;
 
 class ShopService
 {
@@ -86,5 +88,17 @@ class ShopService
             return $item;
         }
         return null;
+    }
+
+    public function generatePotions(DifficultyProfile $difficultyProfile): array
+    {
+        $potionHealRatio = $difficultyProfile->potionHealRatioRange();
+        $minorHealAmount = rand($potionHealRatio[0], (int)($potionHealRatio[1] / 2));
+        $majorHealAmount = rand((int)($potionHealRatio[1] / 2) + 1, $potionHealRatio[1]);
+
+        return [
+            new Potion('Minor Healing Potion', 5, $minorHealAmount),
+            new Potion('Major Healing Potion', 10, $majorHealAmount),
+        ];
     }
 }
