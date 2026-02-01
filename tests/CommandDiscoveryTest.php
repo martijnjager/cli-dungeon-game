@@ -30,10 +30,10 @@ class CommandDiscoveryTest extends TestCase
         $commands = $discovery->load($map, $player);
 
         // $expected list of command names from the Actions directory, should be dynamically derived
-        $actionDir = __DIR__ . '/../src/Command/Actions';
+        $actionDir = realpath(__DIR__ . '/../src/Command/Actions');
         $expected = [];
 
-        if (is_dir($actionDir)) {
+        if ($actionDir && is_dir($actionDir)) {
             foreach (glob($actionDir . '/*Command.php') as $file) {
                 $name = basename($file, '.php'); // e.g. UseItemCommand
                 $base = preg_replace('/Command$/', '', $name);
