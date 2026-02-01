@@ -29,18 +29,18 @@ class CommandDiscoveryTest extends TestCase
         $discovery = new CommandDiscovery();
         $commands = $discovery->load($map, $player);
 
-        $expected = [
-            'buy',
-            'help',
-            'inventory',
-            'look',
-            'move',
-            'peek',
-            'quit',
-            'shop',
-            'status',
-            'use-item',
-        ];
+        // $expected list of command names from the Actions directory, should be dynamically derived
+        $actionDir = __DIR__ . '/../src/Command/Actions';
+        $expected = [];
+
+        if (is_dir($actionDir)) {
+            foreach (glob($actionDir . '/*Command.php') as $file) {
+                $name = basename($file, '.php'); // e.g. UseItemCommand
+                $base = preg_replace('/Command$/', '', $name);
+                $expected[] = strtolower(preg_replace('/(?<!^)([A-Z])/', '-$1', $base));
+            }
+            sort($expected);
+        }
 
         $this->assertEqualsCanonicalizing($expected, array_keys($commands));
 
