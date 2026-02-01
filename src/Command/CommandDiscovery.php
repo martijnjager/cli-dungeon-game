@@ -29,15 +29,13 @@ class CommandDiscovery
     public function load(Map $map, Player $player): array
     {
         $commands = [];
-        $commandFiles = $this->discoverClasses(
+        $commandClasses = $this->discoverClasses(
             $this->commandDirectory,
             $this->commandNamespace,
             'Command'
         );
 
-        foreach ($commandFiles as $file) {
-            $className = $this->commandNamespace . '\\' . basename($file, '.php');
-
+        foreach ($commandClasses as $className) {
             if (!class_exists($className)) {
                 continue;
             }
