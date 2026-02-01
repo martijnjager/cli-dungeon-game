@@ -87,22 +87,19 @@ class MonsterFactory
         // Adjust power distribution based on difficulty
         // Easy difficulty favors weaker monsters, hard difficulty favors stronger monsters
         $diffMultiplier = $this->difficulty->difficultyMultiplier;
+        $powerExponent = $this->difficulty->monsterPowerExponent;
+        $weightMultiplier = $this->difficulty->monsterWeightMultiplier;
         
         // Build weighted array based on power level and difficulty
         $weightedMonsters = [];
         foreach ($monstersByPower as $powerLevel => $monsters) {
             // Calculate weight: lower difficulty favors low power, higher difficulty favors high power
-            // For easy (0.8): power 1 gets high weight, power 3 gets low weight
-            // For hard (1.2): power 1 gets low weight, power 3 gets high weight
-            $weight = $powerLevel * $diffMultiplier;
-            
-            // Adjust to ensure weaker monsters still appear on hard, and bosses rare on easy
             if ($diffMultiplier < 1.0) {
                 // Easy mode: reduce weight for higher power monsters
-                $weight = 1.0 / pow($powerLevel, 1.5);
+                $weight = 1.0 / pow($powerLevel, $powerExponent);
             } elseif ($diffMultiplier > 1.0) {
                 // Hard mode: increase weight for higher power monsters
-                $weight = pow($powerLevel, 1.5);
+                $weight = pow($powerLevel, $powerExponent);
             } else {
                 // Normal mode: balanced distribution
                 $weight = 1.0;
@@ -110,7 +107,7 @@ class MonsterFactory
             
             foreach ($monsters as $monsterType) {
                 // Add each monster with its calculated weight
-                for ($i = 0; $i < max(1, (int)($weight * 10)); $i++) {
+                for ($i = 0; $i < max(1, (int)($weight * $weightMultiplier)); $i++) {
                     $weightedMonsters[] = $monsterType;
                 }
             }
