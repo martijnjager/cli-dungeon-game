@@ -2,7 +2,10 @@
 
 namespace CliGame\Service;
 
+use CliGame\Balancer\DifficultyProfile;
+use CliGame\Character\Player;
 use CliGame\Shop\Items\Item;
+use CliGame\Shop\Items\Potion;
 
 class ShopService
 {
@@ -32,13 +35,70 @@ class ShopService
         }
     }
 
-    public function buyItem(Item $item, int &$playerGold): bool
+    public function findItemByName(string $name): ?Item
     {
-        if (in_array($item, $this->items, true) && $playerGold >= $item->getPrice()) {
-            $playerGold -= $item->getPrice();
-            $this->removeItem($item);
-            return true;
+        foreach ($this->items as $item) {
+            if ($item->is($name)) {
+                return $item;
+            }
         }
-        return false;
+        return null;
+    }
+
+    public function findItemById(int $id): ?Item
+    {
+        foreach ($this->items as $item) {
+            if ($item->is($id)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    public function buyItemByName(string $name, Player $player): ?Item
+    {
+        $item = $this->findItemByName($name);
+        
+        if ($item === null) {
+            return null;
+        }
+
+        foreach ($this->items as $shopItem) {
+            if ($shopItem->is($name)) {
+                $item = $shopItem;
+                break;
+            }
+        }
+
+        if (!empty($item) && $player->canAfford($item)) {
+            $player->buyItem($item);
+            return $item;
+        }
+
+        return null;
+    }
+
+    public function buyItemById(int $id, Player $player): ?Item
+    {
+        $item = $this->findItemById($id);
+        if ($item && $player->canAfford($item)) {
+            $player->buyItem($item);
+
+            return $item;
+        }
+        return null;
+    }
+
+    public function generatePotions(DifficultyProfile $difficultyProfile): array
+    {
+        $potionHealRatio = $difficultyProfile->potionHealRatioRange();
+        $minorHealAmount = rand($potionHealRatio[0], (int)($potionHealRatio[1] / 2));
+        $majorHealAmount = rand((int)($potionHealRatio[1] / 2) + 1, $potionHealRatio[1]);
+
+        return [
+            new Potion('Minor Healing Potion', 5, $minorHealAmount),
+            new Potion('Major Healing Potion', 10, $majorHealAmount),
+        ];
     }
 }

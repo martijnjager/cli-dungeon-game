@@ -2,41 +2,33 @@
 
 namespace CliGame\Character;
 
+use CliGame\Balancer\DifficultyProfile;
+use CliGame\Character\Weapon\DefaultWeapon;
 use CliGame\Enum\MonsterType;
 use CliGame\Trait\AttackPower;
+use CliGame\Trait\DamageBasedHealth;
 
 class Monster
 {
     use AttackPower;
+    use DamageBasedHealth;
 
     protected MonsterType $type;
-    protected int $health;
-
     protected bool $isBoss = false;
 
     protected bool $canPeek = true;
 
+    protected Weapon $activeWeapon;
+
+    public function __construct(DifficultyProfile $difficulty)
+    {
+        $this->activeWeapon = new DefaultWeapon("Default Weapon", 0, "A basic weapon with no special abilities.");
+        $this->initializeHealth($difficulty, $this->minAttackPower, $this->maxAttackPower);
+    }
+
     public function getName(): string
     {
         return $this->type->value;
-    }
-
-    public function getHealth(): int
-    {
-        return $this->health;
-    }
-
-    public function takeDamage(int $damage): void
-    {
-        $this->health -= $damage;
-        if ($this->health < 0) {
-            $this->health = 0;
-        }
-    }
-
-    public function isAlive(): bool
-    {
-        return $this->health > 0;
     }
 
     public function getType(): MonsterType
@@ -63,5 +55,16 @@ class Monster
         }
         
         return !$this->canPeek;
+    }
+
+    public function getActiveWeapon(): Weapon
+    {
+        return $this->activeWeapon;
+    }
+
+    public function chooseAttackOption(): AttackOption
+    {
+        $options = $this->activeWeapon->getAttackOptions();
+        return $options[array_rand($options)];
     }
 }

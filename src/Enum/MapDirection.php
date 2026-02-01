@@ -40,4 +40,14 @@ enum MapDirection: string
             default => null,
         };
     }
+
+    public static function allDeltaDirections(): array
+    {
+        return [
+            self::NORTH->value => [0, -1],
+            self::SOUTH->value => [0, 1],
+            self::EAST->value => [1, 0],
+            self::WEST->value => [-1, 0],
+        ];
+    }
 }

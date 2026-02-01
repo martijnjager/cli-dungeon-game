@@ -22,4 +22,14 @@ class CommandResult
     {
         return $this->output;
     }
+
+    public static function quit(string $message = 'Goodbye!'): self
+    {
+        return new self(true, $message);
+    }
+
+    public static function continue(string $message = ''): self
+    {
+        return new self(false, $message);
+    }
 }

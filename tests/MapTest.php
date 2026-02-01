@@ -2,15 +2,24 @@
 
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Enum\Difficulty;
 use CliGame\Enum\MapDirection;
+use CliGame\Service\Container;
+use CliGame\TreasureTracker;
 use PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Container::getInstance()->instance(TreasureTracker::class, new TreasureTracker());
+    }
+
     public function testPrintMapInMatrixFormatHasCorrectStructure(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $matrix = $map->printMapInMatrixFormat($player);
 
         $this->assertIsArray($matrix);
@@ -31,7 +40,8 @@ class MapTest extends TestCase
     public function testIsValidLocation(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
 
         $this->assertTrue($map->isValidLocation($player->getCurrentLocation()));
         $this->assertFalse($map->isValidLocation(new \CliGame\Location(5, 5)));
@@ -40,7 +50,8 @@ class MapTest extends TestCase
     public function testDiscoverRoomMarksRoomAsDiscovered(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $this->assertFalse($map->isRoomDiscovered($location), 'Room should initially be undiscovered.');
@@ -53,7 +64,8 @@ class MapTest extends TestCase
     public function testGetRoomReturnsCorrectRoomOrNull(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $room = $map->getRoom($location);
@@ -66,7 +78,8 @@ class MapTest extends TestCase
     public function testIsRoomDiscoveredReturnsCorrectStatus(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
         $this->assertFalse($map->isRoomDiscovered($location), 'Room should initially be undiscovered.');
@@ -79,23 +92,26 @@ class MapTest extends TestCase
     public function testGetAdjacentRoomReturnsCorrectRooms(): void
     {
         $player = new Player('Tester');
-        $map = new Map($player, 3);
+        $difficulty = Difficulty::NORMAL->profileRanges();
+        $map = new Map($player, 3, $difficulty);
         $location = $player->getCurrentLocation();
 
-        $adjacentRooms = $map->getAdjacentRoom($location, '');
+        $adjacentRooms = $map->getAdjacentRoom($location, MapDirection::EAST->value);
 
         $this->assertIsArray($adjacentRooms);
-        $this->assertNotEmpty($adjacentRooms, 'There should be adjacent rooms.');
+        $this->assertCount(1, $adjacentRooms);
+        $this->assertArrayHasKey(MapDirection::EAST->value, $adjacentRooms, 'Should return room for the requested direction.');
 
         foreach ($adjacentRooms as $direction => $room) {
             $this->assertContains($direction, MapDirection::toArray(), 'Direction should be valid.');
             $this->assertNotNull($room, 'Adjacent room should not be null.');
         }
 
-        $specificDirection = 'south';
-        $specificRoom = $map->getAdjacentRoom($location, $specificDirection);
+        $blockedDirection = MapDirection::NORTH->value;
+        $fallbackRooms = $map->getAdjacentRoom($location, $blockedDirection);
 
-        $this->assertIsArray($specificRoom);
-        $this->assertArrayHasKey($specificDirection, $specificRoom, 'Should return room for the specific direction.');
+        $this->assertIsArray($fallbackRooms);
+        $this->assertArrayHasKey(MapDirection::EAST->value, $fallbackRooms);
+        $this->assertArrayHasKey(MapDirection::SOUTH->value, $fallbackRooms);
     }
 }

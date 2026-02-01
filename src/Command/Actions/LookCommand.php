@@ -23,7 +23,7 @@ class LookCommand extends Command
             $lines[] = implode(' | ', $row);
         }
 
-        return new CommandResult(false, implode(PHP_EOL, $lines));
+        return CommandResult::continue(implode(PHP_EOL, $lines));
     }
 
     public function help(): string

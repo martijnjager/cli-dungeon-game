@@ -2,6 +2,7 @@
 
 namespace CliGame\Service;
 
+use CliGame\Battle\Result;
 use CliGame\Character\Player;
 use CliGame\Character\Monster;
 
@@ -12,9 +13,9 @@ class BattleService
 
     /**
      * Start the battle between player and monster
-     * @return array<string, mixed> Battle result including logs and status
+     * @return Result Battle result including logs and status
      */
-    public function startBattle(Player $player, Monster $monster): array
+    public function startBattle(Player $player, Monster $monster): Result
     {
         $this->player = $player;
         $this->monster = $monster;
@@ -24,31 +25,25 @@ class BattleService
 
             $startingTurn = $this->calculateStartingTurn();
 
-            $log[] = "New Round! " . ucfirst($startingTurn) . " starts first.";
-
             switch ($startingTurn) {
                 case 'player':
-                    $log[] = $this->playerTurn();
+                    $this->playerTurn();
 
                     if ($this->monster->isAlive()) {
-                        $log[] = $this->monsterTurn();
+                        $this->monsterTurn();
                     }
                     break;
                 case 'monster':
-                    $log[] = $this->monsterTurn();
+                    $this->monsterTurn();
 
                     if ($this->player->isAlive()) {
-                        $log[] = $this->playerTurn();
+                        $this->playerTurn();
                     }
                     break;
             }
         }
 
-        return [
-            'log' => $log,
-            'playerAlive' => $this->player->isAlive(),
-            'monsterAlive' => $this->monster->isAlive(),
-        ];
+        return new Result($this->player->isAlive(), $this->monster->isAlive());
     }
 
     /**
@@ -76,25 +71,58 @@ class BattleService
 
     /**
      * Player's turn logic
-     * @return string Log of the action taken
+     * @return void
      */
-    private function playerTurn(): string
+    private function playerTurn()
     {
+        IO::writeLine("Choose your attack:");
+        $this->player->getActiveWeapon()->printAttackOptions();
+        $choice = fgets(STDIN);
+        $options = $this->player->getActiveWeapon()->getAttackOptions();
+        $selectedOption = $options[intval(trim($choice))] ?? null;
+
+        if ($selectedOption === null) {
+            IO::writeLine("Invalid attack option selected. Turn skipped.");
+            return;
+        }
+
+        if (!$this->calculateReceivesHit($selectedOption->hitChance)) {
+            IO::writeLine($this->player->getName() . " tried to use " . $selectedOption->name . " but missed!");
+            return;
+        }
+
         // Player's attack logic
-        $damage = $this->player->getAttackPower();
-        $this->monster->takeDamage($damage);
-        return $this->player->getName() . " attacks " . $this->monster->getName() . " for " . $damage . " damage!";
+        $damage = $selectedOption->damage();
+        $this->handleDealDamage($this->player, $this->monster, $damage);
     }
 
     /**
      * Monster's turn logic
-     * @return string Log of the action taken
+     * @return void
      */
-    private function monsterTurn(): string
+    private function monsterTurn()
     {
         // Monster's attack logic
-        $damage = $this->monster->getAttackPower();
-        $this->player->takeDamage($damage);
-        return $this->monster->getName() . " attacks " . $this->player->getName() . " for " . $damage . " damage!";
+        $attackOption = $this->monster->chooseAttackOption();
+
+        if (!$this->calculateReceivesHit($attackOption->hitChance)) {
+            IO::writeLine($this->monster->getName() . " tried to use " . $attackOption->name . " but missed!");
+            return;
+        }
+
+        $damage = $attackOption->damage();
+        $this->handleDealDamage($this->monster, $this->player, $damage);
+    }
+
+    private function calculateReceivesHit(int $hitChance): bool
+    {
+        $roll = rand(1, 100);
+        return $roll <= $hitChance;
+    }
+
+    private function handleDealDamage($target, $defender, $damage): void
+    {
+        $defender->takeDamage($damage);
+        IO::writeLine("{$target->getName()} deals {$damage} damage to {$defender->getName()}!");
     }
 }

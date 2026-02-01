@@ -2,6 +2,7 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
+use CliGame\Balancer\DifficultyProfile;
 use CliGame\InputProcessor;
 use CliGame\Map;
 use CliGame\Character\Player;
@@ -9,20 +10,27 @@ use CliGame\Service\Container;
 use CliGame\Service\ShopService;
 use CliGame\Shop\Items\Potion;
 use CliGame\TreasureTracker;
+use CliGame\Enum\Difficulty;
 
 echo 'Welcome to the Dungeon! Type "help" for commands.' . PHP_EOL;
+
+echo 'Select difficulty (easy, normal, hard): ';
+$difficultyInput = trim(fgets(STDIN));
+$difficulty = Difficulty::fromString($difficultyInput);
 
 // echo 'Enter name of player: ';
 // $playerName = trim(fgets(STDIN));
 $playerName = 'Hero';
+$container = Container::getInstance();
 $player = new Player($playerName);
+$container->instance(TreasureTracker::class, new TreasureTracker());
+$container->instance(DifficultyProfile::class, $difficulty->profileRanges());
 
 // Build the map and mark the starting room as discovered
-$map = new Map($player, 5);
+$map = new Map($player, 5, $difficulty->profileRanges());
 $map->discoverRoom($player->getCurrentLocation(), $player);
 
 // Setup container and register core services
-$container = Container::getInstance();
 $container->instance(Player::class, $player);
 $container->instance(Map::class, $map);
 $container->bind(ShopService::class, function (Container $c) {
@@ -31,9 +39,6 @@ $container->bind(ShopService::class, function (Container $c) {
         new Potion('Minor Healing Potion', 5, 'Restores 20 HP', 20),
         new Potion('Major Healing Potion', 10, 'Restores 40 HP', 40),
     ]);
-});
-$container->bind(TreasureTracker::class, function (Container $c) use ($map) {
-    return new TreasureTracker();
 });
 
 $inputProcessor = new InputProcessor($map, $player);

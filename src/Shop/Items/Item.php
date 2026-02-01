@@ -2,17 +2,22 @@
 
 namespace CliGame\Shop\Items;
 
+use CliGame\Character\Player;
+
 abstract class Item
 {
     private string $name;
     private int $price;
     private string $description;
 
+    private int $uniqueId;
+
     public function __construct(string $name, int $price, string $description)
     {
         $this->name = $name;
         $this->price = $price;
         $this->description = $description;
+        $this->uniqueId = $this->generateUniqueId();
     }
 
     public function getName(): string
@@ -30,5 +35,30 @@ abstract class Item
         return $this->description;
     }
 
-    abstract public function use();
+    public function getUniqueId(): string
+    {
+        return $this->uniqueId;
+    }
+
+    private function generateUniqueId(): int
+    {
+        return spl_object_id($this);
+    }
+
+    public function is($itemName): bool
+    {
+        return $this->name == $itemName || $this->uniqueId == $itemName;
+    }
+
+    abstract public function use(Player $player);
+
+    public function printInfo()
+    {
+        return '#' . $this->uniqueId . ': ' . $this->name . ' - ' . $this->description;
+    }
+
+    public function printShop()
+    {
+        return '#' . $this->uniqueId . ': ' . $this->name . ' - ' . $this->price . ' gold ' . ' - ' . $this->description;
+    }
 }

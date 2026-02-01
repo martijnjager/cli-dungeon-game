@@ -18,7 +18,17 @@ class StatusCommand extends Command
         $message = 'Location: (' . $location->getX() . ',' . $location->getY() . '), Health: ' . $this->player->getCurrentHealth();
         $message .= ', Treasure Collected: ' . $this->player->getTreasureCollected();
 
-        return new CommandResult(false, $message);
+        $inventory = $this->player->getInventory()->getItems();
+        if (empty($inventory)) {
+            $message .= ', Inventory: Empty';
+        } else {
+            $itemNames = array_map(function ($itemData) {
+                return $itemData['item']->printInfo() . ' (' . $itemData['quantity'] . ')';
+            }, $inventory);
+            $message .= PHP_EOL . 'Inventory: ' . PHP_EOL . implode(PHP_EOL, $itemNames);
+        }
+
+        return CommandResult::continue($message);
     }
 
     public function help(): string

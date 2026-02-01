@@ -17,14 +17,11 @@ abstract class Command
     protected Player $player;
     protected Container $container;
 
-    public function __construct(Map $map, Player $player)
+    public function __construct(Map $map, Player $player, Container $container)
     {
         $this->map = $map;
         $this->player = $player;
-        $this->container = Container::getInstance();
-
-        // Automatic registration on creation
-        self::$registry[$this->getName()] = $this;
+        $this->container = $container;
     }
 
     abstract public function getName(): string;
@@ -44,5 +41,16 @@ abstract class Command
     public static function clearRegistry(): void
     {
         self::$registry = [];
+    }
+
+    public static function register(Command $command): void
+    {
+        self::$registry[$command->getName()] = $command;
+    }
+
+    public function ask(string $prompt): string
+    {
+        echo $prompt . ' ';
+        return trim(fgets(STDIN));
     }
 }

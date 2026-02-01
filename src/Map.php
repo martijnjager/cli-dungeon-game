@@ -2,6 +2,7 @@
 
 namespace CliGame;
 
+use CliGame\Balancer\DifficultyProfile;
 use CliGame\Character\Monster;
 use CliGame\Character\Monsters\Dragon;
 use CliGame\Character\Monsters\Goblin;
@@ -16,9 +17,11 @@ class Map
 {
     /** @var array<int,array<int,Room>> */
     private array $rooms = [];
+    private ?DifficultyProfile $difficultyProfile = null;
 
-    public function __construct(Player $player, int $numberOfEmptyRooms = 3)
+    public function __construct(Player $player, int $numberOfEmptyRooms = 3, ?DifficultyProfile $difficulty = null)
     {
+        $this->difficultyProfile = $difficulty;
         $this->generateDefaultMap($player, $numberOfEmptyRooms);
     }
 
@@ -104,7 +107,7 @@ class Map
 
                 $x = $room->getLocation()->getX();
                 $y = $room->getLocation()->getY();
-                $mapArray[$y][$x] = ($isInRoom ? 'P: ' . $player->getAttackPower() : '') .  $room->getType()->value . ' ' . ($room->hasMonster() ? $room->getMonster()->getName() : '') . " (" . $x . "," . $y . ")";
+                $mapArray[$y][$x] = ($isInRoom ? 'P: ' : '') .  $room->getType()->value . ($room->hasMonster() ? ' monster ' : '') . ' ' . " (" . $x . "," . $y . ")";
             }
         }
 
@@ -142,16 +145,20 @@ class Map
     
     public function getAdjacentRoom(Location $currentLocation, string $direction): array
     {
-        $deltas = [
-            MapDirection::NORTH => [0, -1],
-            MapDirection::SOUTH => [0, 1],
-            MapDirection::EAST => [1, 0],
-            MapDirection::WEST => [-1, 0],
-        ];
+        $delta = MapDirection::deltaDirection($direction);
+
+        $newLocation = new Location(
+            $currentLocation->getX() + $delta[0],
+            $currentLocation->getY() + $delta[1]
+        );
+
+        if ($this->isValidLocation($newLocation)) {
+            return [$direction => $this->getRoom($newLocation)];
+        }
 
         $adjacentRooms = [];
 
-        foreach ($deltas as $dir => [$dx, $dy]) {
+        foreach (MapDirection::allDeltaDirections() as $dir => [$dx, $dy]) {
             $newLocation = new Location(
                 $currentLocation->getX() + $dx,
                 $currentLocation->getY() + $dy
@@ -175,19 +182,19 @@ class Map
         $roll = mt_rand() / mt_getrandmax();
 
         if ($roll < 0.3) {
-            return new Goblin();
+            return new Goblin($this->difficultyProfile);
         }
 
         if ($roll < 0.5) {
-            return new Troll();
+            return new Troll($this->difficultyProfile);
         }
 
         if ($roll < 0.6) {
-            return new Dragon();
+            return new Dragon($this->difficultyProfile);
         }
 
         // Default/fallback
-        return new Goblin();
+        return new Goblin($this->difficultyProfile);
     }
 
     private function calculateAmountTreasureByRoom(RoomType $roomType): int

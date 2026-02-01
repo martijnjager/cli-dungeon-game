@@ -4,6 +4,10 @@ use CliGame\Command\CommandDiscovery;
 use CliGame\InputProcessor;
 use CliGame\Map;
 use CliGame\Character\Player;
+use CliGame\Enum\RoomType;
+use CliGame\Service\Container;
+use CliGame\Service\ShopService;
+use CliGame\TreasureTracker;
 use PHPUnit\Framework\TestCase;
 
 class InputProcessorTest extends TestCase
@@ -12,8 +16,19 @@ class InputProcessorTest extends TestCase
 
     protected function setUp(): void
     {
+        $container = Container::getInstance();
+        $container->instance(TreasureTracker::class, new TreasureTracker());
+        $container->bind(ShopService::class, fn() => new ShopService([]));
+
         $player = new Player('Tester');
-        $map = new Map($player);
+        $map = new class($player) extends Map {
+            public function decideRoomType(int &$numberOfEnemyRooms, int &$numberOfTreasureRooms, int &$numberOfEmptyRooms): RoomType
+            {
+                $numberOfEmptyRooms++;
+                return RoomType::EMPTY;
+            }
+        };
+
         $this->processor = new InputProcessor($map, $player, new CommandDiscovery());
     }
 
@@ -45,12 +60,20 @@ class InputProcessorTest extends TestCase
     {
         $commands = $this->processor->listCommands();
 
-        $this->assertIsArray($commands);
-        $this->assertContains('help', $commands);
-        $this->assertContains('move', $commands);
-        $this->assertContains('look', $commands);
-        $this->assertContains('status', $commands);
-        $this->assertContains('quit', $commands);
+        // $expected list of command names from the Actions directory, should be dynamically derived
+        $actionDir = realpath(__DIR__ . '/../src/Command/Actions');
+        $expected = [];
+
+        if ($actionDir && is_dir($actionDir)) {
+            foreach (glob($actionDir . '/*Command.php') as $file) {
+                $name = basename($file, '.php'); // e.g. UseItemCommand
+                $base = preg_replace('/Command$/', '', $name);
+                $expected[] = strtolower(preg_replace('/(?<!^)([A-Z])/', '-$1', $base));
+            }
+            sort($expected);
+        }
+
+        $this->assertEqualsCanonicalizing($expected, $commands);
     }
 
     public function testProcessEmptyInput(): void
