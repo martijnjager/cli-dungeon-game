@@ -50,7 +50,7 @@ class MonsterScalingTest extends TestCase
         $hardDragon = new Dragon($hardDifficulty);
 
         // Hard dragon should be more powerful
-        $this->assertGreaterThan($normalDragon->getMinAttackPower(), $hardDragon->getAttackPower());
+        $this->assertGreaterThan($normalDragon->getMinAttackPower(), $hardDragon->getMinAttackPower());
         $this->assertGreaterThan($normalDragon->getCurrentHealth(), $hardDragon->getCurrentHealth());
     }
 
@@ -118,8 +118,8 @@ class MonsterScalingTest extends TestCase
         $troll = new Troll($difficulty);
         $dragon = new Dragon($difficulty);
 
-        $this->assertLessThanOrEqual($goblin->getMaxAttackPower(), $goblin->getAttackPower());
-        $this->assertLessThanOrEqual($troll->getMaxAttackPower(), $troll->getAttackPower());
-        $this->assertLessThanOrEqual($dragon->getMaxAttackPower(), $dragon->getAttackPower());
+        $this->assertLessThanOrEqual($goblin->getMinAttackPower(), $goblin->getMaxAttackPower());
+        $this->assertLessThanOrEqual($troll->getMinAttackPower(), $troll->getMaxAttackPower());
+        $this->assertLessThanOrEqual($dragon->getMinAttackPower(), $dragon->getMaxAttackPower());
     }
 }
