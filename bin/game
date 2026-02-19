@@ -36,8 +36,8 @@ $container->instance(Map::class, $map);
 $container->bind(ShopService::class, function (Container $c) {
     // You can add more items/weapons here later
     return new ShopService([
-        new Potion('Minor Healing Potion', 5, 'Restores 20 HP', 20),
-        new Potion('Major Healing Potion', 10, 'Restores 40 HP', 40),
+        new Potion('Minor Healing Potion', 5, 20),
+        new Potion('Major Healing Potion', 10, 40),
     ]);
 });
 

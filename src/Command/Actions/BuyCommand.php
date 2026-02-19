@@ -15,12 +15,20 @@ class BuyCommand extends Command
 
     public function execute(array $arguments): CommandResult
     {
-        $shopService = $this->container->get(ShopService::class);
+        if (empty($arguments)) {
+            return CommandResult::continue('Please specify an item to buy.');
+        }
 
-        $item = $shopService->buyItemById($arguments[0], $this->player);
+        $shopService = $this->container->get(ShopService::class);
+        $itemIdentifier = $arguments[0];
+
+        $item = null;
+        if (is_numeric($itemIdentifier)) {
+            $item = $shopService->buyItemById((int)$itemIdentifier, $this->player);
+        }
 
         if ($item === null) {
-            $item = $shopService->buyItemByName($arguments[0], $this->player);
+            $item = $shopService->buyItemByName((string)$itemIdentifier, $this->player);
         }
 
         if ($item === null) {
