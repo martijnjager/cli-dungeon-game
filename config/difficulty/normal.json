@@ -1,0 +1,8 @@
+{
+  "enemyHitsToKill": [4, 5],
+  "playerHitsToDie": [6, 8],
+  "potionHealRatio": [0.3, 0.4],
+  "difficultyMultiplier": 1.0,
+  "monsterPowerExponent": 1.0,
+  "monsterWeightMultiplier": 10
+}

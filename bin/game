@@ -17,6 +17,7 @@ echo 'Welcome to the Dungeon! Type "help" for commands.' . PHP_EOL;
 echo 'Select difficulty (easy, normal, hard): ';
 $difficultyInput = trim(fgets(STDIN));
 $difficulty = Difficulty::fromString($difficultyInput);
+$profile = $difficulty->profileRanges();
 
 // echo 'Enter name of player: ';
 // $playerName = trim(fgets(STDIN));
@@ -24,10 +25,10 @@ $playerName = 'Hero';
 $container = Container::getInstance();
 $player = new Player($playerName);
 $container->instance(TreasureTracker::class, new TreasureTracker());
-$container->instance(DifficultyProfile::class, $difficulty->profileRanges());
+$container->instance(DifficultyProfile::class, $profile);
 
 // Build the map and mark the starting room as discovered
-$map = new Map($player, 5, $difficulty->profileRanges());
+$map = new Map($player, 5, $profile);
 $map->discoverRoom($player->getCurrentLocation(), $player);
 
 // Setup container and register core services
