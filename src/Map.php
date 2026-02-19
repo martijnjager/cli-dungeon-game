@@ -4,12 +4,10 @@ namespace CliGame;
 
 use CliGame\Balancer\DifficultyProfile;
 use CliGame\Character\Monster;
-use CliGame\Character\Monsters\Dragon;
-use CliGame\Character\Monsters\Goblin;
-use CliGame\Character\Monsters\Troll;
 use CliGame\Enum\RoomType;
 use CliGame\Character\Player;
 use CliGame\Enum\MapDirection;
+use CliGame\Factory\MonsterFactory;
 use CliGame\Room;
 use CliGame\Service\Container;
 
@@ -18,10 +16,12 @@ class Map
     /** @var array<int,array<int,Room>> */
     private array $rooms = [];
     private ?DifficultyProfile $difficultyProfile = null;
+    private MonsterFactory $monsterFactory;
 
     public function __construct(Player $player, int $numberOfEmptyRooms = 3, ?DifficultyProfile $difficulty = null)
     {
         $this->difficultyProfile = $difficulty;
+        $this->monsterFactory = new MonsterFactory($difficulty);
         $this->generateDefaultMap($player, $numberOfEmptyRooms);
     }
 
@@ -178,23 +178,8 @@ class Map
 
     private function createMonsterForEnemyRoom(): Monster
     {
-        // Weighted distribution for enemy variety
-        $roll = mt_rand() / mt_getrandmax();
-
-        if ($roll < 0.3) {
-            return new Goblin($this->difficultyProfile);
-        }
-
-        if ($roll < 0.5) {
-            return new Troll($this->difficultyProfile);
-        }
-
-        if ($roll < 0.6) {
-            return new Dragon($this->difficultyProfile);
-        }
-
-        // Default/fallback
-        return new Goblin($this->difficultyProfile);
+        // Use MonsterFactory to create a random monster based on difficulty profile
+        return $this->monsterFactory->createRandomMonster();
     }
 
     private function calculateAmountTreasureByRoom(RoomType $roomType): int

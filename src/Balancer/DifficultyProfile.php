@@ -9,6 +9,8 @@ class DifficultyProfile
         private array $playerHitsToDie,
         private array $potionHealRatio,
         public readonly float $difficultyMultiplier = 1.0,
+        public readonly float $monsterPowerExponent = 1.0,
+        public readonly int $monsterWeightMultiplier = 10,
     )
     {
     }

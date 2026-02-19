@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/Support/MocksDifficultyProfile.php';
+
 use CliGame\Command\CommandDiscovery;
 use CliGame\InputProcessor;
 use CliGame\Map;
@@ -12,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 class InputProcessorTest extends TestCase
 {
+    use MocksDifficultyProfile;
+
     private InputProcessor $processor;
 
     protected function setUp(): void
@@ -21,7 +25,8 @@ class InputProcessorTest extends TestCase
         $container->bind(ShopService::class, fn() => new ShopService([]));
 
         $player = new Player('Tester');
-        $map = new class($player) extends Map {
+        $difficultyProfile = $this->mockDifficultyProfile();
+        $map = new class($player, 3, $difficultyProfile) extends Map {
             public function decideRoomType(int &$numberOfEnemyRooms, int &$numberOfTreasureRooms, int &$numberOfEmptyRooms): RoomType
             {
                 $numberOfEmptyRooms++;

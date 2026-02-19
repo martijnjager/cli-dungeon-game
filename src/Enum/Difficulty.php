@@ -3,6 +3,7 @@
 namespace CliGame\Enum;
 
 use CliGame\Balancer\DifficultyProfile;
+use CliGame\Util\JsonFileLoader;
 
 enum Difficulty: string
 {
@@ -21,25 +22,27 @@ enum Difficulty: string
 
     public function profileRanges(): DifficultyProfile
     {
-        return match($this) {
-            self::EASY => new DifficultyProfile(
-                enemyHitsToKill: [3, 4],
-                playerHitsToDie: [8, 10],
-                potionHealRatio: [0.4, 0.5],
-                difficultyMultiplier: 0.8,
-            ),
-            self::HARD => new DifficultyProfile(
-                enemyHitsToKill: [5, 6],
-                playerHitsToDie: [5, 6],
-                potionHealRatio: [0.25, 0.35],
-                difficultyMultiplier: 1.2,
-            ),
-            default => new DifficultyProfile(
-                enemyHitsToKill: [4, 5],
-                playerHitsToDie: [6, 8],
-                potionHealRatio: [0.3, 0.4],
-                difficultyMultiplier: 1.0,
-            ),
-        };
+        $config = $this->loadConfig();
+
+        $namedArgs = [];
+        $ref = new \ReflectionClass(DifficultyProfile::class);
+        $ctor = $ref->getConstructor();
+        if ($ctor) {
+            foreach ($ctor->getParameters() as $param) {
+                $name = $param->getName();
+                if (property_exists($config, $name)) {
+                    $namedArgs[$name] = $config->$name;
+                }
+            }
+        }
+
+        return new DifficultyProfile(...$namedArgs);
+    }
+
+    private function loadConfig(): object
+    {
+        $configPath = dirname(__DIR__, 2) . '/config/difficulty/' . $this->value . '.json';
+        $loader = new JsonFileLoader();
+        return $loader->loadJsonFileAsObject($configPath);
     }
 }

@@ -20,10 +20,28 @@ class Monster
 
     protected Weapon $activeWeapon;
 
+    // Base stats that should be set by subclasses - these will be scaled by difficulty
+    protected int $baseMinAttackPower;
+    protected int $baseMaxAttackPower;
+
     public function __construct(DifficultyProfile $difficulty)
     {
         $this->activeWeapon = new DefaultWeapon("Default Weapon", 0, "A basic weapon with no special abilities.");
+        
+        // Apply difficulty scaling to attack power
+        $this->minAttackPower = (int)ceil($this->baseMinAttackPower * $difficulty->difficultyMultiplier);
+        $this->maxAttackPower = (int)ceil($this->baseMaxAttackPower * $difficulty->difficultyMultiplier);
+        
         $this->initializeHealth($difficulty, $this->minAttackPower, $this->maxAttackPower);
+    }
+
+    /**
+     * Get the base power level for this monster type (used for difficulty-based assignment)
+     * Lower values = weaker monsters, higher values = stronger monsters
+     */
+    public static function getBasePowerLevel(): int
+    {
+        return 1; // Default power level - subclasses should override
     }
 
     public function getName(): string

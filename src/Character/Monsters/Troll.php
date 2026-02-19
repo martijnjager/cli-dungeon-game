@@ -8,10 +8,14 @@ use CliGame\Enum\MonsterType;
 class Troll extends Monster
 {
     protected MonsterType $type = MonsterType::TROLL;
-    protected int $health = 50;
-    protected int $minAttackPower = 5;
-    protected int $maxAttackPower = 10;
+    protected int $baseMinAttackPower = 10;
+    protected int $baseMaxAttackPower = 20;
     
     protected bool $isBoss = false;
     protected bool $canPeek = true;
+
+    public static function getBasePowerLevel(): int
+    {
+        return 2; // Medium power monster
+    }
 }
