@@ -8,8 +8,8 @@ use CliGame\Enum\MonsterType;
 class Dragon extends Monster
 {
     protected MonsterType $type = MonsterType::DRAGON;
-    protected int $baseMinAttackPower = 10;
-    protected int $baseMaxAttackPower = 20;
+    protected int $baseMinAttackPower = 20;
+    protected int $baseMaxAttackPower = 40;
 
     protected bool $isBoss = true;
     protected bool $canPeek = false;

@@ -8,8 +8,8 @@ use CliGame\Enum\MonsterType;
 class Goblin extends Monster
 {
     protected MonsterType $type = MonsterType::GOBLIN;
-    protected int $baseMinAttackPower = 1;
-    protected int $baseMaxAttackPower = 5;
+    protected int $baseMinAttackPower = 5;
+    protected int $baseMaxAttackPower = 15;
 
     protected bool $isBoss = false;
     protected bool $canPeek = true;

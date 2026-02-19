@@ -8,8 +8,8 @@ use CliGame\Enum\MonsterType;
 class Troll extends Monster
 {
     protected MonsterType $type = MonsterType::TROLL;
-    protected int $baseMinAttackPower = 5;
-    protected int $baseMaxAttackPower = 10;
+    protected int $baseMinAttackPower = 10;
+    protected int $baseMaxAttackPower = 20;
     
     protected bool $isBoss = false;
     protected bool $canPeek = true;
